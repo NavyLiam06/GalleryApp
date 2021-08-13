@@ -8,6 +8,8 @@ import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -95,22 +97,29 @@ public class ItemFragment extends Fragment {
     private void loadItems() {
         img_recyclerView.setHasFixedSize(true);
         items = ItemViewModel.listOfItemsandHeader(this.getContext());
-        GridLayoutManager layoutManager = new GridLayoutManager(getActivity(), 5);
+        GridLayoutManager layoutManager = new GridLayoutManager(getActivity(), 4);
         layoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
             @Override
             public int getSpanSize(int position) {
                 if(items.get(position).isHeader())
-                    return 5;
+                    return 4;
                 else
                     return 1;
             }
         });
         img_recyclerView.setLayoutManager(layoutManager);
-        //img_recyclerView.setLayoutManager(new GridLayoutManager(this.getContext(), 5));
         itemAdapter = new ItemAdapter(this.getContext(), items, new ItemAdapter.ItemListener() {
             @Override
             public void onItemClick(Item item) {
                 Toast.makeText(getContext(), "" + item.getPath(), Toast.LENGTH_SHORT).show();
+                FragmentFullscreen fullscreen = new FragmentFullscreen();
+                FragmentManager fragmentManager = getFragmentManager();
+                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+                Bundle bundle = new Bundle();
+                bundle.putSerializable("item", item);
+                fullscreen.setArguments(bundle);
+                fragmentTransaction.replace(R.id.fragment_container, fullscreen).addToBackStack("tag");
+                fragmentTransaction.commit();
             }
         });
         img_recyclerView.setAdapter(itemAdapter);
